@@ -21,7 +21,7 @@ prefix = 'api/v1/'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path(prefix + 'auth/', include('dj_rest_auth.urls')),
 
     # Local apps
-    path(prefix + 'auth/', include('core.auth.urls')),
 ]

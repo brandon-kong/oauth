@@ -11,8 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import environ
-import os
+from datetime import timedelta
 from .env import ( env, BASE_DIR )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,6 +27,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
 
 # Application definition
 
@@ -37,7 +38,16 @@ INSTALLED_APPS = [
     'core.auth',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_standardized_errors',
+
+    # AllAuth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites'
 ]
 
 MIDDLEWARE = [
@@ -55,6 +66,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -133,6 +146,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication Backends
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 
 # Custom user model
 
@@ -143,7 +163,8 @@ AUTH_USER_MODEL = "core_user.User"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+
     ),
     'EXCEPTION_HANDLER': 'drf_standardized_errors.handler.exception_handler'
 }
@@ -151,6 +172,35 @@ REST_FRAMEWORK = {
 # DRF Standardized Errors
 
 DRF_STANDARDIZED_ERRORS = {
-    "EXCEPTION_FORMATTER_CLASS": "core.util.exception_handler.ExceptionFormatter",
-    "EXCEPTION_HANDLER_CLASS": "drf_standardized_errors.handler.ExceptionHandler",
+    'EXCEPTION_FORMATTER_CLASS': 'core.util.exception_handler.ExceptionFormatter',
+    'EXCEPTION_HANDLER_CLASS': 'drf_standardized_errors.handler.ExceptionHandler',
+}
+
+# SimpleJWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY,
+    'ALGORITHM': 'HS256',
+    'ROTATE_REFRESH_TOKENS': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+}
+
+# All Auth
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+LOGIN_REDIRECT_URL = '/'
+
+# Rest auth
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'refresh',
+
+    'LOGIN_SERIALIZER': 'core.user.serializers.login.UserLoginSerializer',
+    'JWT_TOKEN_CLAIMS_SERIALIZER': 'core.auth.serializers.tokens.TokenObtainPairSerializer'
 }

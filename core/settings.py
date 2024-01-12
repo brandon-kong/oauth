@@ -35,6 +35,9 @@ INSTALLED_APPS = [
     # Local apps
     'core.user',
     'core.auth',
+
+    'rest_framework',
+    'drf_standardized_errors',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -134,3 +137,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom user model
 
 AUTH_USER_MODEL = "core_user.User"
+
+# Rest Framework
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'EXCEPTION_HANDLER': 'drf_standardized_errors.handler.exception_handler'
+}
+
+# DRF Standardized Errors
+
+DRF_STANDARDIZED_ERRORS = {
+    "EXCEPTION_FORMATTER_CLASS": "core.util.exception_handler.ExceptionFormatter",
+    "EXCEPTION_HANDLER_CLASS": "drf_standardized_errors.handler.ExceptionHandler",
+}

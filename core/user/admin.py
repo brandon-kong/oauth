@@ -12,13 +12,14 @@ class UserAdmin(UserAdminModule):
     form = UserChangeForm
     model = User
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        (None, {"fields": ("id", "implicit_id", "email", "password")}),
         ("Personal info", {"fields": ("first_name", "last_name")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     fields = None
     list_display = ["email", "first_name", "last_name", "is_staff"]
+    readonly_fields = ["id", "implicit_id", "date_joined"]
 
     ordering = ["email"]
 
